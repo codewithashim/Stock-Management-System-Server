@@ -32,7 +32,27 @@ async function dbConnection() {
 dbConnection();
 
 // ========================== DB Connection ============================
-const ProductCollection = client.db("stockManegment").collection("products");
+const PurchesdStockCollection = client
+  .db("stockManegment")
+  .collection("purchesdStocks");
+const BorrowedStockCollection = client
+  .db("stockManegment")
+  .collection("borrowedStocks");
+const ReturnedStockCollection = client
+  .db("stockManegment")
+  .collection("returnedStocks");
+const SoldStockCollection = client
+  .db("stockManegment")
+  .collection("soldStocks");
+
+const ReturnStockCollection = client
+  .db("stockManegment")
+  .collection("returnStocks");
+
+const LendStockCollection = client
+  .db("stockManegment")
+  .collection("lendStocks");
+
 const userCollection = client.db("stockManegment").collection("users");
 
 // ========================== DB Collection ============================
@@ -86,9 +106,10 @@ const verifyAdmin = async (req, res, next) => {
 };
 
 // ========================== jwt token ============================
+
 // ========================== Route ============================
 
-// user route
+// user route =================================
 // CREATE USER
 app.post("/users", async (req, res) => {
   const user = req.body;
@@ -110,8 +131,135 @@ app.get("/users/:email", async (req, res) => {
   const result = await userCollection.findOne(query);
   res.send(result);
 });
+// user route =================================
 
-// user route
+// purchesdStock route =================================
+// CREATE purchesdStock
+app.post("/purchesdStock", async (req, res) => {
+  const purchesdStock = req.body;
+  const result = await PurchesdStockCollection.insertOne(purchesdStock);
+  res.send(result);
+});
+
+// GET purchesdStock
+app.get("/purchesdStock", async (req, res) => {
+  const query = {};
+  const result = await PurchesdStockCollection.find(query).toArray();
+  res.send(result);
+});
+
+// purchesdStock route =================================
+
+// borrowedStock route =================================
+// CREATE borrowedStock
+app.post("/borrowedStock", async (req, res) => {
+  const borrowedStock = req.body;
+  const result = await BorrowedStockCollection.insertOne(borrowedStock);
+  res.send(result);
+});
+
+// GET borrowedStock
+app.get("/borrowedStock", async (req, res) => {
+  const query = {};
+  const result = await BorrowedStockCollection.find(query).toArray();
+  res.send(result);
+});
+
+// borrowedStock route =================================
+
+// returnedStock route =================================
+
+// CREATE returnedStock
+app.post("/returnedStock", async (req, res) => {
+  const returnedStock = req.body;
+  const result = await ReturnedStockCollection.insertOne(returnedStock);
+  res.send(result);
+});
+
+// GET returnedStock
+app.get("/returnedStock", async (req, res) => {
+  const query = {};
+  const result = await ReturnedStockCollection.find(query).toArray();
+  res.send(result);
+});
+
+// returnedStock route =================================
+
+// aggregate route =================================
+
+// GET aggregate
+
+app.get("/aggregate", async (req, res) => {
+  const query = {};
+  const result = await PurchesdStockCollection.aggregate([
+    {
+      $group: {
+        _id: "$stockName",
+        totalQuantity: { $sum: "$quantity" },
+        totalAmount: { $sum: "$amount" },
+      },
+    },
+  ]);
+  res.send(result);
+})
+
+// aggregate route =================================
+
+// Sold Stock route =================================
+
+// CREATE Sold Stock
+app.post("/soldStock", async (req, res) => {
+  const soldStock = req.body;
+  const result = await SoldStockCollection.insertOne(soldStock);
+  res.send(result);
+});
+
+// GET Sold Stock
+app.get("/soldStock", async (req, res) => {
+  const query = {};
+  const result = await SoldStockCollection.find(query).sort({ _id: -1 });
+  res.send(result);
+});
+
+// Sold Stock route =================================
+
+// Return Stock route =================================
+
+// CREATE Return Stock`
+app.post("/returnStock", async (req, res) => {
+  const returnStock = req.body;
+  const result = await ReturnStockCollection.insertOne(returnStock);
+  res.send(result);
+});
+
+// GET Return Stock
+
+app.get("/returnStock", async (req, res) => {
+  const query = {};
+  const result = await ReturnStockCollection.find(query).sort({ _id: -1 });
+  res.send(result);
+});
+
+// Return Stock route =================================
+
+// Lend Stock route =================================
+
+// CREATE Lend Stock
+app.post("/lendStock", async (req, res) => {
+  const lendStock = req.body;
+  const result = await LendStockCollection.insertOne(lendStock);
+  res.send(result);
+});
+
+// GET Lend Stock
+
+app.get("/lendStock", async (req, res) => {
+  const query = {};
+  const result = await LendStockCollection.find(query).sort({ _id: -1 });
+  res.send(result);
+});
+
+// Lend Stock route =================================
 
 // ========================== Route ============================
 
