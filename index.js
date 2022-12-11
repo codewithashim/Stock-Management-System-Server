@@ -55,6 +55,10 @@ const LendStockCollection = client
 
 const userCollection = client.db("stockManegment").collection("users");
 
+const productCollection = client
+  .db("stockManegment")
+  .collection("allAddedProducts");
+
 // ========================== DB Collection ============================
 
 // ========================== jwt token ============================
@@ -187,21 +191,48 @@ app.get("/returnedStock", async (req, res) => {
 
 // aggregate route =================================
 
-// GET aggregate
+// aggregate 3 collection in one
 
-app.get("/aggregate", async (req, res) => {
+app.get("/allProduct", async (req, res) => {
   const query = {};
-  const result = await PurchesdStockCollection.aggregate([
-    {
-      $group: {
-        _id: "$stockName",
-        totalQuantity: { $sum: "$quantity" },
-        totalAmount: { $sum: "$amount" },
-      },
-    },
-  ]);
+  const purchesdStocks = await PurchesdStockCollection.find(query).toArray();
+  const borrowedStocks = await BorrowedStockCollection.find(query).toArray();
+  const returnedStocks = await ReturnedStockCollection.find(query).toArray();
+  const result = [{ purchesdStocks, borrowedStocks, returnedStocks }];
+
   res.send(result);
-})
+});
+
+// app.get("/aggregate", async (req, res) => {
+//   const query = {};
+//   const result = await PurchesdStockCollection.aggregate([
+//     {
+//       $lookup: {
+//         from: "purchesdStocks",
+//         localField: "purchesdStockId",
+//         foreignField: "_id",
+//         as: "purchesdStock",
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: "borrowedStocks",
+//         localField: "borrowedStockId",
+//         foreignField: "_id",
+//         as: "borrowedStock",
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: "returnedStocks",
+//         localField: "returnedStockId",
+//         foreignField: "_id",
+//         as: "returnedStock",
+//       },
+//     },
+//   ]).toArray();
+//   res.send(result);
+// });
 
 // aggregate route =================================
 
